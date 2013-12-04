@@ -32,3 +32,7 @@
 #include <caml/threads.h>
 
 #include "http-parser/http_parser.h"
+
+#define HTTP_parser_struct_val(v) \
+  (*(http_parser **)Data_custom_val(v))
+
