@@ -29,7 +29,6 @@
 #include <caml/fail.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
-#include <caml/signals.h>
 
 #include "http_parser_stubs.h"
 
