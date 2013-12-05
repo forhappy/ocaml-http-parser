@@ -8,10 +8,10 @@ type http_method = DELETE | GET | HEAD | POST | PUT | CONNECT
 
 type http_parser_type = HTTP_REQUEST | HTTP_RESPONSE | HTTP_BOTH
 
-type http_data_cb = http_parser -> int * string
+type http_data_cb = http_parser -> string -> int -> int
 type http_cb = http_parser -> int
 
-type http_parser_setting = {
+type http_parser_settings = {
   on_message_begin:    http_cb;
   on_url:              http_data_cb;
   on_status_complete:  http_cb;
@@ -22,3 +22,12 @@ type http_parser_setting = {
   on_message_complete: http_cb
 }
 
+external init:
+     http_parser_settings
+  -> http_parser_type
+  -> http_parser = "caml_http_parser_init"
+
+external execute:
+     http_parser
+  -> string
+  -> int = "caml_http_parser_execute"

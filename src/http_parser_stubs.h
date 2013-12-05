@@ -3,7 +3,7 @@
 
 #include <caml/mlvalues.h>
 
-#include "http_parser/http_parser.h"
+#include "http-parser/http_parser.h"
 
 typedef struct caml_http_parser_settings_s_ {
   value on_message_begin;
