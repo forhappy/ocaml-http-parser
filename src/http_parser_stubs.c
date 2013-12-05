@@ -357,9 +357,9 @@ caml_http_parser_execute(value parser, value data)
     caml_http_parser_struct_val(parser);
   const char *local_data = String_val(data);
   int parsed = http_parser_execute(native_parser->parser,
-                      native_parser->native_settings,
-                      local_data,
-                      strlen(local_data));
+                                   native_parser->native_settings,
+                                   local_data,
+                                   strlen(local_data));
   nparsed = Val_int(parsed);
 
   CAMLreturn(nparsed);
