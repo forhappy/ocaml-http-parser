@@ -44,6 +44,69 @@ static const enum http_parser_type HTTP_PARSER_TYPE_TABLE[] = {
   HTTP_BOTH
 };
 
+static const enum http_method HTTP_METHOD_TABLE[] = {
+  HTTP_DELETE,
+  HTTP_GET,
+  HTTP_HEAD,
+  HTTP_POST,
+  HTTP_PUT,
+  HTTP_CONNECT,
+  HTTP_OPTIONS,
+  HTTP_TRACE,
+  HTTP_COPY,
+  HTTP_LOCK,
+  HTTP_MKCOL,
+  HTTP_MOVE,
+  HTTP_PROPFIND,
+  HTTP_PROPPATCH,
+  HTTP_SEARCH,
+  HTTP_UNLOCK,
+  HTTP_REPORT,
+  HTTP_MKACTIVITY,
+  HTTP_CHECKOUT,
+  HTTP_MERGE,
+  HTTP_MSEARCH,
+  HTTP_NOTIFY,
+  HTTP_SUBSCRIBE,
+  HTTP_UNSUBSCRIBE,
+  HTTP_PATCH,
+  HTTP_PURGE
+};
+
+static const enum http_errno HTTP_ERRNO_TABLE[] = {
+  HPE_OK,
+  HPE_CB_message_begin,
+  HPE_CB_status_complete,
+  HPE_CB_url,
+  HPE_CB_header_field,
+  HPE_CB_header_value,
+  HPE_CB_headers_complete,
+  HPE_CB_body,
+  HPE_CB_message_complete,
+  HPE_INVALID_EOF_STATE,
+  HPE_HEADER_OVERFLOW,
+  HPE_CLOSED_CONNECTION,
+  HPE_INVALID_VERSION,
+  HPE_INVALID_STATUS,
+  HPE_INVALID_METHOD,
+  HPE_INVALID_URL,
+  HPE_INVALID_HOST,
+  HPE_INVALID_PORT,
+  HPE_INVALID_PATH,
+  HPE_INVALID_QUERY_STRING,
+  HPE_INVALID_FRAGMENT,
+  HPE_LF_EXPECTED,
+  HPE_INVALID_HEADER_TOKEN,
+  HPE_INVALID_CONTENT_LENGTH,
+  HPE_INVALID_CHUNK_SIZE,
+  HPE_INVALID_CONSTANT,
+  HPE_INVALID_INTERNAL_STATE,
+  HPE_STRICT,
+  HPE_PAUSED,
+  HPE_UNKNOWN,
+};
+
+
 static struct custom_operations caml_http_parser_struct_ops = {
   "org.ocaml.http_parser",
   custom_finalize_default,
@@ -58,6 +121,20 @@ caml_http_parser_type_ml2c(value v)
 {
   CAMLparam1(v);
   return HTTP_PARSER_TYPE_TABLE[Long_val(v)];
+}
+
+static enum http_method
+caml_http_method_ml2c(value v)
+{
+  CAMLparam1(v);
+  return HTTP_METHOD_TABLE[Long_val(v)];
+}
+
+static enum http_errno
+caml_http_errno_ml2c(value v)
+{
+  CAMLparam1(v);
+  return HTTP_ERRNO_TABLE[Long_val(v)];
 }
 
 static value
@@ -298,6 +375,71 @@ caml_http_should_keep_alive(value parser)
   caml_http_parser_t *native_parser =
     caml_http_parser_struct_val(parser);
   int rc = http_should_keep_alive(native_parser->parser);
+  r = Val_int(rc);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_method_str(value method)
+{
+  CAMLparam1(method);
+  CAMLlocal1(r);
+
+  enum http_method m = caml_http_method_ml2c(method);
+  const char *method_str = http_method_str(m);
+  r = caml_copy_string(method_str);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_errno_name(value errno)
+{
+  CAMLparam1(errno);
+  CAMLlocal1(r);
+
+  enum http_errno e = caml_http_errno_ml2c(errno);
+  const char *name = http_errno_name(e);
+  r = caml_copy_string(name);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_errno_description(value errno)
+{
+  CAMLparam1(errno);
+  CAMLlocal1(r);
+
+  enum http_errno e = caml_http_errno_ml2c(errno);
+  const char *descr = http_errno_description(e);
+  r = caml_copy_string(descr);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_parser_pause(value parser, value paused)
+{
+  CAMLparam2(parser, paused);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+  http_parser_pause(native_parser->parser, Int_val(paused));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_http_body_is_final(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+  int rc = http_body_is_final(native_parser->parser);
   r = Val_int(rc);
 
   CAMLreturn(r);
