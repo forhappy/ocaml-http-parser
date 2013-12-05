@@ -22,6 +22,10 @@ type http_parser_settings = {
   on_message_complete: http_cb
 }
 
+external version:
+     unit
+  -> int * int * int = "caml_http_parser_version"
+
 external init:
      http_parser_settings
   -> http_parser_type

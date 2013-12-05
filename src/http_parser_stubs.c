@@ -219,6 +219,24 @@ caml_parse_http_parser_settings(value settings,
 }
 
 CAMLprim value
+caml_http_parser_version(value unit)
+{
+  CAMLparam1(unit);
+  CAMLlocal1(caml_version);
+
+  caml_version = caml_alloc(3, 0);
+  unsigned long version = http_parser_version();
+  unsigned major = (version >> 16) & 255;
+  unsigned minor = (version >> 8) & 255;
+  unsigned patch = version & 255;
+  Store_field(caml_version, 0, Val_int(major));
+  Store_field(caml_version, 1, Val_int(minor));
+  Store_field(caml_version, 2, Val_int(patch));
+
+  CAMLreturn(caml_version);
+}
+
+CAMLprim value
 caml_http_parser_init(value settings, value type)
 {
   CAMLparam1(type);
