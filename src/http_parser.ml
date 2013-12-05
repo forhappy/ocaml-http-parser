@@ -35,3 +35,7 @@ external execute:
      http_parser
   -> string
   -> int = "caml_http_parser_execute"
+
+external http_should_keep_alive:
+     http_parser
+  -> int = "caml_http_should_keep_alive"

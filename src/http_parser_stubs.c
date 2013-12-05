@@ -289,3 +289,17 @@ caml_http_parser_execute(value parser, value data)
   CAMLreturn(nparsed);
 }
 
+CAMLprim value
+caml_http_should_keep_alive(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+  int rc = http_should_keep_alive(native_parser->parser);
+  r = Val_int(rc);
+
+  CAMLreturn(r);
+}
+
