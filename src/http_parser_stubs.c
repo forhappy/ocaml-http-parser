@@ -548,7 +548,7 @@ caml_http_parser_parse_url(value url, value is_connect)
 
   if (rc == 0) {
     for (field_index = 0; field_index < UF_MAX; field_index++) {
-      if (native_url.field_set && (1 << field_index)) {
+      if (native_url.field_set & (1 << field_index)) {
         uint16_t off = native_url.field_data[field_index].off;
         uint16_t len = native_url.field_data[field_index].len;
         url_part = caml_alloc_string(len);
