@@ -530,6 +530,7 @@ caml_http_is_upgrade(value parser)
   CAMLreturn(r);
 }
 
+// WARNING: Be careful, this interface is not fully tested now.
 CAMLprim value
 caml_http_parser_parse_url(value url, value is_connect)
 {
