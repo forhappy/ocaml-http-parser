@@ -284,7 +284,22 @@ static int
 caml_parse_http_parser_settings(value settings,
                                 caml_http_parser_settings_t *native_settings)
 {
-  CAMLparam1(settings);
+
+  // TODO: error code should be returned if settings doesn't meet with
+  // the specifications. value @settings is an OCaml object containing
+  // the necessary callbacks needed by the http_parser instance.
+  // The value @settings is defined like this:
+  //
+  // type http_parser_settings = {
+  //   on_message_begin:    http_cb;
+  //   on_url:              http_data_cb;
+  //   on_status_complete:  http_cb;
+  //   on_header_field:     http_data_cb;
+  //   on_header_value:     http_data_cb;
+  //   on_headers_complete: http_cb;
+  //   on_body:             http_data_cb;
+  //   on_message_complete: http_cb
+  // }
 
   native_settings->on_message_begin    = Field(settings, 0);
   native_settings->on_url              = Field(settings, 1);
@@ -340,7 +355,8 @@ caml_http_parser_init(value settings, value type)
     (caml_http_parser_settings_t *)malloc(sizeof(caml_http_parser_settings_t));
   int rc = caml_parse_http_parser_settings(settings,
                                            caml_settings);
-  if (rc == -1) { // TODO: error handling here.
+  if (rc == -1) {
+    // TODO: error handling here.
   }
   enum http_parser_type parser_type = caml_http_parser_type_ml2c(type);
   http_parser_init(native_parser, parser_type);
@@ -397,6 +413,21 @@ caml_http_method_str(value method)
 }
 
 CAMLprim value
+caml_http_errno_code(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+
+  int http_errno  = native_parser->parser->http_errno;
+  r = Val_int(http_errno);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
 caml_http_errno_name(value errno)
 {
   CAMLparam1(errno);
@@ -444,6 +475,57 @@ caml_http_body_is_final(value parser)
     caml_http_parser_struct_val(parser);
   int rc = http_body_is_final(native_parser->parser);
   r = Val_int(rc);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_status_code(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+
+  int status_code  = native_parser->parser->status_code;
+  r = Val_int(status_code);
+
+  CAMLreturn(r);
+}
+
+CAMLprim value
+caml_http_method_code(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+
+  int method  = native_parser->parser->method;
+  r = Val_int(method);
+
+  CAMLreturn(r);
+}
+
+/**
+ * 1 = Upgrade header was present and the parser has exited because of that.
+ * 0 = No upgrade header present.
+ * Should be checked when http_parser_execute() returns in addition to
+ * error checking.
+ */
+CAMLprim value
+caml_http_is_upgrade(value parser)
+{
+  CAMLparam1(parser);
+  CAMLlocal1(r);
+
+  caml_http_parser_t *native_parser =
+    caml_http_parser_struct_val(parser);
+
+  int upgrade  = native_parser->parser->upgrade;
+  r = Val_int(upgrade);
 
   CAMLreturn(r);
 }

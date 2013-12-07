@@ -103,9 +103,17 @@ external http_should_keep_alive:
      http_parser
   -> int = "caml_http_should_keep_alive"
 
+external http_method_code:
+     http_parser
+  -> http_method = "caml_http_method_code"
+
 external http_method_str:
      http_method
   -> string = "caml_http_method_str"
+
+external http_errno_code:
+     http_parser
+  -> http_errno = "caml_http_errno_code"
 
 external http_errno_name:
      http_errno
@@ -114,3 +122,12 @@ external http_errno_name:
 external http_errno_description:
      http_errno
   -> string = "caml_http_errno_description"
+
+external http_status_code:
+     http_parser
+  -> int = "caml_http_status_code"
+
+external http_is_upgrade:
+     http_parser
+  -> int = "caml_http_is_upgrade"
+
