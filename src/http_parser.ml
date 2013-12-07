@@ -76,6 +76,17 @@ type http_parser_settings = {
   on_message_complete: http_cb
 }
 
+type http_parser_url = {
+  filed_set: int;
+  schema: string;
+  host  : string;
+  port  : string;
+  path  : string;
+  query : string;
+  fragment  : string;
+  userinfo  : string
+}
+
 external version:
      unit
   -> int * int * int = "caml_http_parser_version"
@@ -95,15 +106,15 @@ external pause:
   -> int
   -> unit = "caml_http_parser_pause"
 
-external http_body_is_final:
+external body_is_final:
      http_parser
   -> int = "caml_http_body_is_final"
 
-external http_should_keep_alive:
+external should_keep_alive:
      http_parser
   -> int = "caml_http_should_keep_alive"
 
-external http_method_code:
+external method_code:
      http_parser
   -> http_method = "caml_http_method_code"
 
@@ -111,7 +122,7 @@ external http_method_str:
      http_method
   -> string = "caml_http_method_str"
 
-external http_errno_code:
+external errno_code:
      http_parser
   -> http_errno = "caml_http_errno_code"
 
@@ -123,11 +134,14 @@ external http_errno_description:
      http_errno
   -> string = "caml_http_errno_description"
 
-external http_status_code:
+external status_code:
      http_parser
   -> int = "caml_http_status_code"
 
-external http_is_upgrade:
+external is_upgrade:
      http_parser
   -> int = "caml_http_is_upgrade"
 
+external parse_url:
+     string
+  -> http_parser_url = "caml_http_parser_parse_url"
