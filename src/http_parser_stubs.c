@@ -534,10 +534,9 @@ CAMLprim value
 caml_http_parser_parse_url(value url, value is_connect)
 {
   CAMLparam2(url, is_connect);
-  CAMLlocal1(caml_url);
-  CAMLlocal5(schema, host, port, path, query);
-  CAMLlocal2(fragment, userinfo);
+  CAMLlocal2(caml_url, url_part);
 
+  int field_index;
   struct http_parser_url native_url;
   const char *url_str = String_val(url);
   int rc = http_parser_parse_url(url_str,
@@ -552,61 +551,14 @@ caml_http_parser_parse_url(value url, value is_connect)
   caml_url = caml_alloc(8, 0);
   Store_field(caml_url, 0, Val_int(native_url.field_set));
 
-  if (native_url.field_set && 1 << UF_SCHEMA) { // Parse URL schema.
-    uint16_t off = native_url.field_data[UF_SCHEMA].off;
-    uint16_t len = native_url.field_data[UF_SCHEMA].len;
-    schema = caml_alloc_string(len);
-    memcpy(String_val(schema), url_str + off, len);
-    Store_field(caml_url, 1, schema);
-  }
-
-  if (native_url.field_set && 1 << UF_HOST) { // Parse URL host.
-    uint16_t off = native_url.field_data[UF_HOST].off;
-    uint16_t len = native_url.field_data[UF_HOST].len;
-    host = caml_alloc_string(len);
-    memcpy(String_val(host), url_str + off, len);
-    Store_field(caml_url, 2, host);
-  }
-
-  if (native_url.field_set && 1 << UF_PORT) { // Parse URL port.
-    uint16_t off = native_url.field_data[UF_PORT].off;
-    uint16_t len = native_url.field_data[UF_PORT].len;
-    port = caml_alloc_string(len);
-    memcpy(String_val(port), url_str + off, len);
-    Store_field(caml_url, 3, port);
-  }
-
-
-  if (native_url.field_set && 1 << UF_PATH) { // Parse URL path.
-    uint16_t off = native_url.field_data[UF_PATH].off;
-    uint16_t len = native_url.field_data[UF_PATH].len;
-    path = caml_alloc_string(len);
-    memcpy(String_val(path), url_str + off, len);
-    Store_field(caml_url, 4, path);
-  }
-
-  if (native_url.field_set && 1 << UF_QUERY) { // Parse URL query.
-    uint16_t off = native_url.field_data[UF_QUERY].off;
-    uint16_t len = native_url.field_data[UF_QUERY].len;
-    query = caml_alloc_string(len);
-    memcpy(String_val(query), url_str + off, len);
-    Store_field(caml_url, 5, query);
-  }
-
-  if (native_url.field_set && 1 << UF_FRAGMENT) { // Parse URL fragment.
-    uint16_t off = native_url.field_data[UF_FRAGMENT].off;
-    uint16_t len = native_url.field_data[UF_FRAGMENT].len;
-    fragment = caml_alloc_string(len);
-    memcpy(String_val(fragment), url_str + off, len);
-    Store_field(caml_url, 6, fragment);
-  }
-
-  if (native_url.field_set && 1 << UF_USERINFO) { // Parse URL userinfo.
-    uint16_t off = native_url.field_data[UF_USERINFO].off;
-    uint16_t len = native_url.field_data[UF_USERINFO].len;
-    userinfo = caml_alloc_string(len);
-    memcpy(String_val(userinfo), url_str + off, len);
-    Store_field(caml_url, 7, userinfo);
+  for (field_index = 0; field_index < UF_MAX; field_index++) {
+    if (native_url.field_set && (1 << field_index)) {
+      uint16_t off = native_url.field_data[field_index].off;
+      uint16_t len = native_url.field_data[field_index].len;
+      url_part = caml_alloc_string(len);
+      memcpy(String_val(url_part), url_str + off, len);
+      Store_field(caml_url, field_index + 1, url_part);
+    }
   }
 
   CAMLreturn(caml_url);
