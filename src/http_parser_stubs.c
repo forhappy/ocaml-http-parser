@@ -530,7 +530,6 @@ caml_http_is_upgrade(value parser)
   CAMLreturn(r);
 }
 
-// WARNING: Be careful, this interface is not fully tested now.
 CAMLprim value
 caml_http_parser_parse_url(value url, value is_connect)
 {
@@ -540,25 +539,26 @@ caml_http_parser_parse_url(value url, value is_connect)
   int field_index;
   struct http_parser_url native_url;
   const char *url_str = String_val(url);
+  memset(&native_url, 0, sizeof(struct http_parser_url));
+  caml_url = caml_alloc(7, 0);
   int rc = http_parser_parse_url(url_str,
                                  strlen(url_str),
                                  Int_val(is_connect),
                                  &native_url);
 
-  if (rc != 0) {
-    // TODO: error handling.
-  }
-
-  caml_url = caml_alloc(8, 0);
-  Store_field(caml_url, 0, Val_int(native_url.field_set));
-
-  for (field_index = 0; field_index < UF_MAX; field_index++) {
-    if (native_url.field_set && (1 << field_index)) {
-      uint16_t off = native_url.field_data[field_index].off;
-      uint16_t len = native_url.field_data[field_index].len;
-      url_part = caml_alloc_string(len);
-      memcpy(String_val(url_part), url_str + off, len);
-      Store_field(caml_url, field_index + 1, url_part);
+  if (rc == 0) {
+    for (field_index = 0; field_index < UF_MAX; field_index++) {
+      if (native_url.field_set && (1 << field_index)) {
+        uint16_t off = native_url.field_data[field_index].off;
+        uint16_t len = native_url.field_data[field_index].len;
+        url_part = caml_alloc_string(len);
+        memcpy(String_val(url_part), url_str + off, len);
+        Store_field(caml_url, field_index, url_part);
+      }
+    }
+  } else {
+    for (field_index = 0; field_index < UF_MAX; field_index++) {
+      Store_field(caml_url, field_index, caml_copy_string(""));
     }
   }
 

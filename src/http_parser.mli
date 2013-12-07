@@ -71,7 +71,6 @@ type http_parser_settings = {
   on_message_complete : http_cb;
 }
 type http_parser_url = {
-  filed_set : int;
   schema : string;
   host : string;
   port : string;

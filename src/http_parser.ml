@@ -77,7 +77,6 @@ type http_parser_settings = {
 }
 
 type http_parser_url = {
-  filed_set: int;
   schema: string;
   host  : string;
   port  : string;
