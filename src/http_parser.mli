@@ -96,4 +96,5 @@ external http_errno_description : http_errno -> string
   = "caml_http_errno_description"
 external status_code : http_parser -> int = "caml_http_status_code"
 external is_upgrade : http_parser -> int = "caml_http_is_upgrade"
-external parse_url : string -> http_parser_url = "caml_http_parser_parse_url"
+external parse_url : string -> int -> http_parser_url
+  = "caml_http_parser_parse_url"

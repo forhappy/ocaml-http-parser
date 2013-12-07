@@ -144,4 +144,5 @@ external is_upgrade:
 
 external parse_url:
      string
+  -> int
   -> http_parser_url = "caml_http_parser_parse_url"
