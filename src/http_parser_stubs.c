@@ -37,21 +37,25 @@
 #define caml_http_parser_struct_val(v) \
   (*(caml_http_parser_t **)Data_custom_val(v))
 
+/** Parser Type */
 static const enum http_parser_type HTTP_PARSER_TYPE_TABLE[] = {
   HTTP_REQUEST,
   HTTP_RESPONSE,
   HTTP_BOTH
 };
 
+/* Request Methods */
 static const enum http_method HTTP_METHOD_TABLE[] = {
   HTTP_DELETE,
   HTTP_GET,
   HTTP_HEAD,
   HTTP_POST,
   HTTP_PUT,
+  /* pathological */
   HTTP_CONNECT,
   HTTP_OPTIONS,
   HTTP_TRACE,
+  /* webdav */
   HTTP_COPY,
   HTTP_LOCK,
   HTTP_MKCOL,
@@ -60,18 +64,22 @@ static const enum http_method HTTP_METHOD_TABLE[] = {
   HTTP_PROPPATCH,
   HTTP_SEARCH,
   HTTP_UNLOCK,
+  /* subversion */
   HTTP_REPORT,
   HTTP_MKACTIVITY,
   HTTP_CHECKOUT,
   HTTP_MERGE,
+  /* upnp */
   HTTP_MSEARCH,
   HTTP_NOTIFY,
   HTTP_SUBSCRIBE,
   HTTP_UNSUBSCRIBE,
+  /* RFC-5789 */
   HTTP_PATCH,
   HTTP_PURGE
 };
 
+/** Errno-related constants */
 static const enum http_errno HTTP_ERRNO_TABLE[] = {
   HPE_OK,
   HPE_CB_message_begin,
@@ -105,7 +113,6 @@ static const enum http_errno HTTP_ERRNO_TABLE[] = {
   HPE_UNKNOWN,
 };
 
-
 static struct custom_operations caml_http_parser_struct_ops = {
   "org.ocaml.http_parser",
   custom_finalize_default,
@@ -118,21 +125,18 @@ static struct custom_operations caml_http_parser_struct_ops = {
 static enum http_parser_type
 caml_http_parser_type_ml2c(value v)
 {
-  CAMLparam1(v);
   return HTTP_PARSER_TYPE_TABLE[Long_val(v)];
 }
 
 static enum http_method
 caml_http_method_ml2c(value v)
 {
-  CAMLparam1(v);
   return HTTP_METHOD_TABLE[Long_val(v)];
 }
 
 static enum http_errno
 caml_http_errno_ml2c(value v)
 {
-  CAMLparam1(v);
   return HTTP_ERRNO_TABLE[Long_val(v)];
 }
 
